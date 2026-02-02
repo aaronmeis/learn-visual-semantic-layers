@@ -23,7 +23,6 @@ import {
     Box,
     Terminal,
     Unplug,
-    Image as ImageIcon,
     TrendingUp,
     Target,
     Users,
@@ -35,9 +34,8 @@ import {
 } from 'lucide-react';
 
 // --- Gemini API Utility ---
-// Note: apiKey is provided by the execution environment. 
-// If moving to a local environment, you will need to provide your own key.
-const apiKey = "";
+// Note: Use an environment variable VITE_GEMINI_API_KEY for the API key.
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 const callGemini = async (prompt, systemInstruction = "") => {
     let delay = 1000;
@@ -182,10 +180,10 @@ const RESOURCES = {
         icon: <Unplug className="w-5 h-5" />,
         description: 'Tools for chaining layers and building complex agentic workflows.',
         items: [
-            { name: 'LangChain', desc: 'The industry standard for chaining LLM calls and managing memory.' },
-            { name: 'LlamaIndex', desc: 'Specialized in connecting LLMs to external data and indexing.' },
-            { name: 'Haystack', desc: 'An open-source NLP framework for building RAG pipelines.' },
-            { name: 'Semantic Kernel', desc: 'Microsoft SDK for integrating LLMs with conventional languages.' }
+            { name: 'LangChain', desc: 'The industry standard for chaining LLM calls and managing memory.', url: 'https://python.langchain.com/' },
+            { name: 'LlamaIndex', desc: 'Specialized in connecting LLMs to external data and indexing.', url: 'https://www.llamaindex.ai/' },
+            { name: 'Haystack', desc: 'An open-source NLP framework for building RAG pipelines.', url: 'https://haystack.deepset.ai/' },
+            { name: 'Semantic Kernel', desc: 'Microsoft SDK for integrating LLMs with conventional languages.', url: 'https://learn.microsoft.com/en-us/semantic-kernel/' }
         ]
     },
     'benchmarks': {
@@ -193,10 +191,10 @@ const RESOURCES = {
         icon: <BarChart3 className="w-5 h-5" />,
         description: 'Standardized tests to measure reasoning, coding, and factual accuracy.',
         items: [
-            { name: 'MMLU', desc: 'Massive Multitask Language Understanding across 57 subjects.' },
-            { name: 'HumanEval', desc: 'Measures code generation capabilities in Python.' },
-            { name: 'GSM8K', desc: 'Grade school math word problems for multi-step reasoning.' },
-            { name: 'HELM', desc: 'Holistic Evaluation of Language Models across many metrics.' }
+            { name: 'MMLU', desc: 'Massive Multitask Language Understanding across 57 subjects.', url: 'https://github.com/hendrycks/test' },
+            { name: 'HumanEval', desc: 'Measures code generation capabilities in Python.', url: 'https://github.com/openai/human-eval' },
+            { name: 'GSM8K', desc: 'Grade school math word problems for multi-step reasoning.', url: 'https://github.com/openai/grade-school-math' },
+            { name: 'HELM', desc: 'Holistic Evaluation of Language Models across many metrics.', url: 'https://crfm.stanford.edu/helm/' }
         ]
     },
     'safety': {
@@ -204,10 +202,10 @@ const RESOURCES = {
         icon: <ShieldCheck className="w-5 h-5" />,
         description: 'Mitigating risks, bias, and hallucinations in production systems.',
         items: [
-            { name: 'Guardrails AI', desc: 'Framework for adding structure and quality checks to outputs.' },
-            { name: 'Llama Guard', desc: 'A safety classifier model for input/output monitoring.' },
-            { name: 'Perspective API', desc: 'Google Jigsaw tool for detecting toxic or harmful speech.' },
-            { name: 'Red Teaming', desc: 'Adversarial testing to find edge-case failures.' }
+            { name: 'Guardrails AI', desc: 'Framework for adding structure and quality checks to outputs.', url: 'https://www.guardrailsai.com/' },
+            { name: 'Llama Guard', desc: 'A safety classifier model for input/output monitoring.', url: 'https://huggingface.co/meta-llama/Llama-Guard-3-8B' },
+            { name: 'Perspective API', desc: 'Google Jigsaw tool for detecting toxic or harmful speech.', url: 'https://www.perspectiveapi.com/' },
+            { name: 'Red Teaming', desc: 'Adversarial testing to find edge-case failures.', url: 'https://www.anthropic.com/news/red-teaming-language-models' }
         ]
     },
     'open-source': {
@@ -215,19 +213,10 @@ const RESOURCES = {
         icon: <Box className="w-5 h-5" />,
         description: 'Publicly accessible models and datasets for localized deployment.',
         items: [
-            { name: 'Llama 3', desc: 'Meta\'s state-of-the-art open weights foundation model.' },
-            { name: 'Mistral / Mixtral', desc: 'High-efficiency models using Mixture-of-Experts architecture.' },
-            { name: 'Hugging Face Hub', desc: 'The central repository for weights, datasets, and demos.' },
-            { name: 'Ollama', desc: 'Local tool for running LLMs efficiently on personal hardware.' }
-        ]
-    },
-    'blueprint': {
-        title: 'Original Visual Blueprint',
-        icon: <ImageIcon className="w-5 h-5" />,
-        description: 'The conceptual reference architecture used to derive this interactive breakdown.',
-        items: [
-            { name: 'Architectural Reference', desc: 'The primary high-fidelity diagram outlining the six-layer stack.' },
-            { name: 'Isometric View', desc: 'Baseline for the 3D representation and interaction model.' }
+            { name: 'Llama 3', desc: 'Meta\'s state-of-the-art open weights foundation model.', url: 'https://llama.meta.com/' },
+            { name: 'Mistral / Mixtral', desc: 'High-efficiency models using Mixture-of-Experts architecture.', url: 'https://mistral.ai/' },
+            { name: 'Hugging Face Hub', desc: 'The central repository for weights, datasets, and demos.', url: 'https://huggingface.co/' },
+            { name: 'Ollama', desc: 'Local tool for running LLMs efficiently on personal hardware.', url: 'https://ollama.com/' }
         ]
     }
 };
@@ -251,6 +240,10 @@ const App = () => {
 
     const handleGenerateBusiness = async () => {
         if (!businessInput) return;
+        if (!apiKey) {
+            alert("Please set VITE_GEMINI_API_KEY in your environment to use the AI generator.");
+            return;
+        }
         setAiLoading(true);
         try {
             const systemPrompt = "You are a Business Strategy Consultant. Given a company/industry, generate 4 strategic ROI values for a semantic LLM system. Return JSON as a list of 4 objects with: title, desc, metric.";
@@ -318,7 +311,7 @@ const App = () => {
                         onClick={() => navigateTo(key)}
                         className={`w-full flex items-center px-6 py-2 text-xs transition-colors ${currentPath === key ? 'text-white font-bold' : 'hover:text-white'}`}
                     >
-                        {key === 'blueprint' ? <ImageIcon className="w-3 h-3 mr-2 text-pink-400" /> : <ChevronRight className={`w-3 h-3 mr-2 ${currentPath === key ? 'text-blue-400' : 'text-slate-600'}`} />}
+                        <ChevronRight className={`w-3 h-3 mr-2 ${currentPath === key ? 'text-blue-400' : 'text-slate-600'}`} />
                         {RESOURCES[key].title}
                     </button>
                 ))}
@@ -589,33 +582,21 @@ const App = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {data.items.map((item, i) => (
-                        <div key={i} className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-200 transition-all group">
-                            <h3 className="text-lg font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{item.name}</h3>
+                        <a
+                            key={i}
+                            href={item.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-lg hover:border-blue-200 transition-all group block text-left"
+                        >
+                            <h3 className="text-lg font-black text-slate-900 mb-2 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{item.name}</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-medium">{item.desc}</p>
-                            <div className="mt-4 flex items-center text-[10px] font-black text-slate-300 group-hover:text-slate-500 uppercase tracking-widest transition-colors">
-                                {id === 'blueprint' ? 'Visual Link' : 'Documentation'} <ArrowRight className="w-2 h-2 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                            <div className="mt-4 flex items-center text-[10px] font-black text-blue-500 uppercase tracking-widest transition-colors">
+                                View Documentation <ExternalLink className="w-3 h-3 ml-2 group-hover:translate-x-0.5 transition-transform" />
                             </div>
-                        </div>
+                        </a>
                     ))}
                 </div>
-
-                {id === 'blueprint' && (
-                    <div className="mt-8 p-1 bg-slate-200 rounded-2xl overflow-hidden shadow-inner border border-slate-300 animate-pulse-subtle">
-                        <div className="bg-slate-50 rounded-xl p-12 flex flex-col items-center justify-center text-center space-y-4">
-                            <ImageIcon className="w-12 h-12 text-slate-300" />
-                            <div>
-                                <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest mb-2">Original Diagram Reference</h4>
-                                <p className="text-xs text-slate-400 max-w-xs">The isometric stack on the Home dashboard is the live recreation of your uploaded blueprint.</p>
-                            </div>
-                            <button
-                                onClick={() => navigateTo('home')}
-                                className="px-6 py-2 bg-slate-900 text-white text-[10px] font-black uppercase tracking-widest rounded-full hover:bg-blue-600 transition-colors"
-                            >
-                                View Interactive Stack
-                            </button>
-                        </div>
-                    </div>
-                )}
             </div>
         );
     };
@@ -721,11 +702,9 @@ const App = () => {
                             <div>
                                 <h4 className="text-[9px] font-black text-slate-600 uppercase tracking-widest mb-6">Ecosystem</h4>
                                 <div className="space-y-3">
-                                    <button onClick={() => navigateTo('frameworks')} className="block text-xs text-slate-400 hover:text-white font-bold transition-colors text-left">Frameworks</button>
-                                    <button onClick={() => navigateTo('benchmarks')} className="block text-xs text-slate-400 hover:text-white font-bold transition-colors text-left">Benchmarks</button>
-                                    <button onClick={() => navigateTo('blueprint')} className="block text-xs text-pink-400 hover:text-pink-300 font-bold transition-colors text-left flex items-center gap-1">
-                                        <ImageIcon size={10} /> Original Blueprint
-                                    </button>
+                                    <button onClick={() => navigateTo('frameworks')} className="block text-xs text-slate-400 hover:text-white font-bold transition-colors text-left uppercase tracking-widest">Frameworks</button>
+                                    <button onClick={() => navigateTo('benchmarks')} className="block text-xs text-slate-400 hover:text-white font-bold transition-colors text-left uppercase tracking-widest">Benchmarks</button>
+                                    <button onClick={() => navigateTo('safety')} className="block text-xs text-slate-400 hover:text-white font-bold transition-colors text-left uppercase tracking-widest">Safety Guides</button>
                                 </div>
                             </div>
                             <div>
