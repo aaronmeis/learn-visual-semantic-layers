@@ -718,7 +718,6 @@ const App = () => {
                     </div>
                     <div className="max-w-7xl mx-auto mt-12 pt-6 border-t border-slate-900 flex justify-between items-center text-[9px] font-black text-slate-700 uppercase tracking-widest">
                         <span>v2.5 Alpha</span>
-                        <span>NotebookLM Blueprint Reference</span>
                     </div>
                 </footer>
             </main>
